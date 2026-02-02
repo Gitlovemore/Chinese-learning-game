@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>汉字寻宝 - 听音解锁累计版（移动端自适应）</title>
+    <title>汉字寻宝 - 听音解锁累计版（移动端优化版）</title>
     <style>
         :root {
             --p: #ff7e5f; --s: #feb47b; 
@@ -131,9 +131,25 @@
             align-items: center; margin-top: 30px;
         }
         .coin-slot {
-            width: 15px; height: 55px; background: #222;
-            border: 4px solid #ffd700; border-radius: 6px;
+            width: 60px; height: 80px; background: #222;
+            border: 4px solid #ffd700; border-radius: 10px;
             position: relative; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+        }
+        .coin-slot::after {
+            content: "投币口";
+            position: absolute;
+            bottom: -25px;
+            color: #ffd700;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .coin-slot.active {
+            border-color: #ffeb3b;
+            box-shadow: 0 0 15px #ffeb3b;
+            background: #333;
         }
         .start-btn {
             width: 70px; height: 70px; background: #90a4ae;
@@ -156,9 +172,30 @@
         
         .coin-obj {
             width: 45px; height: 45px; background: radial-gradient(circle, #ffd700, #ff8f00);
-            border-radius: 50%; border: 2px solid #b8860b; cursor: grab;
+            border-radius: 50%; border: 2px solid #b8860b; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold; color: #5d4037; box-shadow: 0 3px 0 #5d4037;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .coin-obj.clicked {
+            animation: coinFly 0.8s ease-out forwards;
+        }
+        
+        @keyframes coinFly {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(var(--target-x, 100px), var(--target-y, -100px)) scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--target-x, 100px), var(--target-y, -100px)) scale(0);
+                opacity: 0;
+            }
         }
 
         .lock-grid {
@@ -219,8 +256,8 @@
             }
             
             .arcade-box {
-                width: 90vw;
-                height: 50vh;
+                width: 95vw;
+                height: 55vh;
                 transform: scale(0.9);
                 transform-origin: center;
             }
@@ -262,6 +299,7 @@
             
             #level-content {
                 padding-bottom: 100px;
+                overflow-y: auto;
             }
             
             .control-panel {
@@ -272,17 +310,75 @@
             }
             
             .coin-slot {
-                height: 45px;
+                width: 80px;
+                height: 100px;
+                border-width: 6px;
+                font-size: 1rem;
             }
             
             .start-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 0.8rem;
+                width: 70px;
+                height: 70px;
+                font-size: 0.9rem;
+            }
+            
+            .coin-obj {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
             }
             
             html {
                 font-size: 14px;
+            }
+            
+            /* 第三关移动端布局优化 */
+            #level3-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                width: 100%;
+                height: 100%;
+                padding-top: 10px;
+                overflow-y: auto;
+            }
+            
+            #purse-container {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 20px;
+                z-index: 20;
+            }
+            
+            #purse {
+                width: 90%;
+                height: 120px;
+                display: flex;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                gap: 8px;
+                border: 3px solid #ddd;
+                border-radius: 15px;
+                padding: 10px;
+                overflow-y: auto;
+                background: #fff;
+                justify-content: center;
+            }
+            
+            .arcade-box {
+                width: 95%;
+                height: 45vh;
+                margin-top: 10px;
+                position: relative;
+                z-index: 5;
+            }
+            
+            .coin-slot::after {
+                font-size: 0.9rem;
+                bottom: -30px;
             }
         }
 
@@ -311,6 +407,11 @@
             
             .header {
                 font-size: 1rem;
+            }
+            
+            .coin-slot {
+                width: 70px;
+                height: 90px;
             }
         }
 
@@ -345,6 +446,7 @@
             
             #level-content {
                 margin-top: 40px;
+                padding-bottom: 60px;
             }
             
             .bottom-ui {
@@ -375,6 +477,24 @@
             #level-content {
                 padding-bottom: 80px;
             }
+            
+            /* 横屏时第三关布局 */
+            #level3-container {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+            
+            #purse-container {
+                width: 40%;
+                margin-bottom: 0;
+            }
+            
+            .arcade-box {
+                width: 50%;
+                height: 70vh;
+            }
         }
 
         /* 触摸设备优化 */
@@ -389,13 +509,8 @@
                 transition: transform 0.1s;
             }
             
-            .coin-slot::after {
-                content: '';
-                position: absolute;
-                top: -10px;
-                bottom: -10px;
-                left: -10px;
-                right: -10px;
+            .coin-slot {
+                touch-action: manipulation;
             }
             
             .clue-item, .card[draggable="true"] {
@@ -483,6 +598,15 @@
             
             .clue-pinyin {
                 font-size: 0.5rem;
+            }
+            
+            .coin-slot {
+                width: 70px;
+                height: 90px;
+            }
+            
+            .coin-slot::after {
+                font-size: 0.7rem;
             }
         }
 
@@ -593,6 +717,59 @@
         .shop-btn:active {
             transform: scale(0.95);
         }
+        
+        /* 金币投掷区域 */
+        #drop-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        /* 第三关钱包标题 */
+        .purse-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        /* 投币提示 */
+        .coin-hint {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            padding: 5px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            max-width: 90%;
+        }
+        
+        /* 移动端点击收集按钮 */
+        .collect-btn {
+            background: linear-gradient(135deg, var(--p), var(--s));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .collect-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body id="main-body">
@@ -643,11 +820,23 @@ const AudioSys = {
     }
 };
 
+// 设备检测
+const DeviceDetector = {
+    isMobile: false,
+    isTouchDevice: false,
+    
+    init() {
+        this.isTouchDevice = 'ontouchstart' in window;
+        this.isMobile = window.innerWidth < 768 || this.isTouchDevice;
+        return this.isMobile;
+    }
+};
+
 // 触摸支持模块
 const TouchSupport = {
     init() {
         // 为触摸设备优化交互
-        if ('ontouchstart' in window) {
+        if (DeviceDetector.isTouchDevice) {
             // 添加触摸事件监听
             document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
             document.addEventListener('touchend', this.handleTouchEnd, { passive: true });
@@ -710,8 +899,13 @@ const ScreenOrientation = {
 
 const Game = {
     words: [], collected: [], coins: 0, level: 1, walletSize: 0,
+    isMobile: false,
+    insertedCoins: 0, // 已投入金币计数器
     
     start() {
+        // 初始化设备检测
+        this.isMobile = DeviceDetector.init();
+        
         // 从本地存储读取累计金币
         const savedCoins = localStorage.getItem('hjtx_total_coins');
         this.coins = savedCoins ? parseInt(savedCoins) : 0;
@@ -777,11 +971,29 @@ const Game = {
         const renderTask = () => {
             if(idx >= this.words.length) return setTimeout(() => this.initL2(), 1200);
             const a = Math.floor(Math.random()*5)+1, b = Math.floor(Math.random()*4)+1;
-            cont.innerHTML = `
-                <div style="font-size:3rem; margin-bottom:30px; font-weight:bold; color:#555; text-align:center;">
-                    ${a} + ${b} = ?
-                </div>
-                <div id="L1-grid" style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"></div>`;
+            
+            // 移动端和桌面端不同UI
+            if (this.isMobile) {
+                // 移动端：点击正确答案后直接收集
+                cont.innerHTML = `
+                    <div style="font-size:3rem; margin-bottom:30px; font-weight:bold; color:#555; text-align:center;">
+                        ${a} + ${b} = ?
+                    </div>
+                    <div id="L1-grid" style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"></div>
+                    <div style="margin-top:20px; color:#666; font-size:0.9rem;">
+                        点击正确答案学习汉字
+                    </div>`;
+            } else {
+                // 桌面端：保持原样，需要拖拽
+                cont.innerHTML = `
+                    <div style="font-size:3rem; margin-bottom:30px; font-weight:bold; color:#555; text-align:center;">
+                        ${a} + ${b} = ?
+                    </div>
+                    <div id="L1-grid" style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"></div>
+                    <div style="margin-top:20px; color:#666; font-size:0.9rem;">
+                        点击正确答案，然后拖拽汉字到收集袋
+                    </div>`;
+            }
             
             const grid = document.getElementById('L1-grid');
             [a+b, a+b+1, a+b-1].sort(()=>Math.random()-0.5).forEach(v => {
@@ -792,15 +1004,41 @@ const Game = {
                     if(v === a+b) {
                         AudioSys.playTone(600); 
                         const w = this.words[idx];
-                        c.innerHTML = `<span style="font-size:0.8rem; color:#666;">${PinyinDict[w]||''}</span><span style="font-size:1.5rem;">${w}</span>`;
-                        c.style.background = "#fff9c4"; 
-                        c.draggable = true;
-                        c.ondragstart = (e) => { 
-                            e.dataTransfer.setData('text/plain', w); 
-                            document.getElementById('clue-tray').classList.add('drag-active'); 
-                        };
-                        c.ondragend = () => document.getElementById('clue-tray').classList.remove('drag-active');
-                        AudioSys.speak(w);
+                        
+                        if (this.isMobile) {
+                            // 移动端：点击后直接收集
+                            c.innerHTML = `<span style="font-size:0.8rem; color:#666;">${PinyinDict[w]||''}</span><span style="font-size:1.5rem;">${w}</span>`;
+                            c.style.background = "#e8f5e9"; 
+                            AudioSys.speak(w);
+                            
+                            // 移动端添加"收集"按钮
+                            const collectBtn = document.createElement('button');
+                            collectBtn.className = 'collect-btn';
+                            collectBtn.innerHTML = '✅ 收集';
+                            collectBtn.onclick = () => {
+                                this.addClue(w);
+                                idx++;
+                                renderTask();
+                            };
+                            
+                            // 如果已经有收集按钮，先移除
+                            const existingBtn = document.querySelector('.collect-btn');
+                            if (existingBtn) existingBtn.remove();
+                            
+                            // 将收集按钮添加到页面
+                            cont.appendChild(collectBtn);
+                        } else {
+                            // 桌面端：保持原样，需要拖拽
+                            c.innerHTML = `<span style="font-size:0.8rem; color:#666;">${PinyinDict[w]||''}</span><span style="font-size:1.5rem;">${w}</span>`;
+                            c.style.background = "#fff9c4"; 
+                            c.draggable = true;
+                            c.ondragstart = (e) => { 
+                                e.dataTransfer.setData('text/plain', w); 
+                                document.getElementById('clue-tray').classList.add('drag-active'); 
+                            };
+                            c.ondragend = () => document.getElementById('clue-tray').classList.remove('drag-active');
+                            AudioSys.speak(w);
+                        }
                     } else {
                         AudioSys.playTone(150, 'square');
                     }
@@ -813,17 +1051,20 @@ const Game = {
         tray.innerHTML = ''; // 清空之前的收集
         this.collected = [];
         
-        tray.ondragover = e => e.preventDefault();
-        tray.ondrop = e => { 
-            e.preventDefault(); 
-            tray.classList.remove('drag-active'); 
-            const w = e.dataTransfer.getData('text/plain'); 
-            if(w && !['gold'].includes(w)) { 
-                this.addClue(w); 
-                idx++; 
-                renderTask(); 
-            }
-        };
+        // 桌面端拖拽支持
+        if (!this.isMobile) {
+            tray.ondragover = e => e.preventDefault();
+            tray.ondrop = e => { 
+                e.preventDefault(); 
+                tray.classList.remove('drag-active'); 
+                const w = e.dataTransfer.getData('text/plain'); 
+                if(w && !['gold'].includes(w)) { 
+                    this.addClue(w); 
+                    idx++; 
+                    renderTask(); 
+                }
+            };
+        }
         
         renderTask();
     },
@@ -885,22 +1126,35 @@ const Game = {
     initL3() {
         this.level = 3; 
         this.updateUI();
-        this.setHint(`投入金币启动游戏机！`);
+        this.setHint(`点击金币进行投币！`);
         const cont = document.getElementById('level-content');
         
-        // 移动端优化：调整布局
-        const isMobile = window.innerWidth < 768;
-        const purseWidth = isMobile ? '80px' : '90px';
+        // 重置已投入金币计数器
+        this.insertedCoins = 0;
+        
+        // 移动端和桌面端不同UI
+        const isMobile = this.isMobile;
         
         cont.innerHTML = `
-            <div style="display:flex; ${isMobile ? 'flex-direction:column; align-items:center; gap:20px;' : 'gap:20px; align-items:center;'}">
-                <div id="purse" style="width:${purseWidth}; height:200px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px; border:2px solid #ddd; border-radius:15px; padding:10px; overflow-y:auto; background:#fff;">
-                    <div style="width:100%; text-align:center; font-size:0.8rem; color:#888;">金币钱包</div>
+            <div id="level3-container" style="display:flex; ${isMobile ? 'flex-direction:column; align-items:center;' : 'gap:20px; align-items:center; justify-content:center;'} width:100%; height:100%; overflow-y:auto;">
+                <div id="purse-container" style="display:flex; flex-direction:column; align-items:center; margin-bottom:${isMobile ? '20px' : '0'};">
+                    <div class="purse-title">💰 金币钱包 (${this.walletSize}个)</div>
+                    <div id="purse" style="width:${isMobile ? '90%' : '120px'}; height:${isMobile ? '120px' : '200px'}; display:flex; flex-wrap:wrap; align-content:flex-start; gap:8px; border:3px solid #ffd700; border-radius:15px; padding:10px; overflow-y:auto; background:#fffaf0; justify-content:center;">
+                    </div>
+                    <div class="coin-hint">${isMobile ? '点击金币进行投币' : '拖动金币到投币口'}</div>
+                    <div id="coin-counter" style="margin-top:10px; font-size:0.9rem; color:#666;">
+                        已投币: <span id="inserted-count">0</span> / ${this.walletSize}
+                    </div>
                 </div>
-                <div class="arcade-box">
-                    <div class="arcade-screen" id="arcade-scr">INSERT<br>COINS</div>
+                
+                <div class="arcade-box" style="${isMobile ? 'width:95%; height:45vh;' : ''}">
+                    <div class="arcade-screen" id="arcade-scr">
+                        INSERT<br>COINS
+                    </div>
                     <div class="control-panel">
-                        <div class="coin-slot" id="target-slot"></div>
+                        <div class="coin-slot" id="target-slot">
+                            <span style="font-size:2rem; color:#ffd700;">↓</span>
+                        </div>
                         <div id="btn-start" class="start-btn">START</div>
                     </div>
                 </div>
@@ -912,51 +1166,113 @@ const Game = {
             const c = document.createElement('div'); 
             c.className = 'coin-obj'; 
             c.textContent = '¥'; 
-            c.draggable = true; 
-            c.ondragstart = e => e.dataTransfer.setData('type', 'gold'); 
+            
+            if (isMobile) {
+                // 移动端：点击投币
+                c.onclick = () => {
+                    if (this.insertedCoins < this.walletSize) {
+                        // 播放音效
+                        AudioSys.playTone(1200);
+                        
+                        // 动画效果：飞向投币口
+                        const slot = document.getElementById('target-slot');
+                        const coinRect = c.getBoundingClientRect();
+                        const slotRect = slot.getBoundingClientRect();
+                        
+                        // 计算动画目标位置
+                        const targetX = slotRect.left + slotRect.width/2 - coinRect.left - 22;
+                        const targetY = slotRect.top + slotRect.height/2 - coinRect.top - 22;
+                        
+                        // 设置CSS自定义属性用于动画
+                        c.style.setProperty('--target-x', `${targetX}px`);
+                        c.style.setProperty('--target-y', `${targetY}px`);
+                        
+                        // 添加动画类
+                        c.classList.add('clicked');
+                        
+                        // 更新游戏状态
+                        setTimeout(() => {
+                            c.remove(); // 动画完成后移除金币
+                            this.insertedCoins++;
+                            this.coins--; // 减少金币总数
+                            this.updateUI();
+                            
+                            // 更新显示
+                            document.getElementById('inserted-count').textContent = this.insertedCoins;
+                            document.getElementById('arcade-scr').innerHTML = `已投入<br>${this.insertedCoins}/${this.walletSize}`;
+                            
+                            // 检查是否达到所需金币数
+                            if(this.insertedCoins >= this.walletSize) {
+                                this.enableStartButton();
+                            }
+                            
+                            // 投币口动画
+                            slot.classList.add('active');
+                            setTimeout(() => slot.classList.remove('active'), 500);
+                        }, 800);
+                    }
+                };
+            } else {
+                // 桌面端：保持拖拽
+                c.draggable = true; 
+                c.ondragstart = e => e.dataTransfer.setData('type', 'gold'); 
+            }
+            
             purse.appendChild(c); 
         }
         
-        let inserted = 0; 
-        const req = this.walletSize; 
-        const slot = document.getElementById('target-slot');
-        
-        slot.ondragover = e => e.preventDefault();
-        slot.ondrop = e => {
-            if(e.dataTransfer.getData('type') === 'gold' && purse.lastChild) {
-                purse.lastChild.remove(); 
-                AudioSys.playTone(1200);
-                if(this.coins > 0) this.coins--; 
-                this.updateUI();
-                inserted++; 
-                document.getElementById('arcade-scr').innerHTML = `已投入<br>${inserted}/${req}`;
-                if(inserted >= req) this.enableStartButton();
-            }
-        };
-        
-        // 移动端触摸拖拽支持
-        if ('ontouchstart' in window) {
-            const coins = document.querySelectorAll('.coin-obj');
-            coins.forEach(coin => {
-                coin.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    coin.style.position = 'absolute';
-                    coin.style.left = touch.clientX - 22 + 'px';
-                    coin.style.top = touch.clientY - 22 + 'px';
-                });
-            });
+        // 桌面端拖拽支持
+        if (!isMobile) {
+            const slot = document.getElementById('target-slot');
+            let inserted = 0; 
+            const req = this.walletSize; 
+            
+            slot.ondragover = e => e.preventDefault();
+            slot.ondrop = e => {
+                if(e.dataTransfer.getData('type') === 'gold') {
+                    const coins = document.querySelectorAll('.coin-obj');
+                    if (coins.length > 0) {
+                        const lastCoin = coins[coins.length - 1];
+                        if (lastCoin.parentElement === purse) {
+                            lastCoin.remove(); 
+                            AudioSys.playTone(1200);
+                            
+                            // 更新游戏状态
+                            this.coins--; 
+                            this.updateUI();
+                            inserted++; 
+                            
+                            // 更新显示
+                            document.getElementById('inserted-count').textContent = inserted;
+                            document.getElementById('arcade-scr').innerHTML = `已投入<br>${inserted}/${req}`;
+                            
+                            if(inserted >= req) {
+                                this.enableStartButton();
+                            }
+                            
+                            // 投币口动画
+                            slot.classList.add('active');
+                            setTimeout(() => slot.classList.remove('active'), 500);
+                        }
+                    }
+                }
+            };
         }
+        
+        // 初始化显示
+        document.getElementById('inserted-count').textContent = '0';
     },
     
     enableStartButton() {
         const btn = document.getElementById('btn-start');
-        document.getElementById('arcade-scr').innerHTML = "准备<br>开始";
-        document.getElementById('arcade-scr').style.color = "#ffff00";
+        const scr = document.getElementById('arcade-scr');
+        scr.innerHTML = "准备<br>开始";
+        scr.style.color = "#ffff00";
         btn.classList.add('active');
         btn.onclick = () => { 
             AudioSys.playTone(1500, 'square'); 
             btn.classList.remove('active'); 
+            btn.onclick = null;
             this.startMoleGame(); 
         };
     },
@@ -973,7 +1289,7 @@ const Game = {
         
         // 游戏网格
         const grid = document.createElement('div');
-        const isMobile = window.innerWidth < 768;
+        const isMobile = this.isMobile;
         const gridSize = isMobile ? '100px' : '125px';
         grid.style.cssText = `display:grid; grid-template-columns:repeat(3,1fr); width:100%; height:${gridSize}; gap:6px; padding:4px; box-sizing:border-box;`;
         scr.appendChild(grid);
@@ -1150,17 +1466,6 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // 初始化屏幕方向检测
     ScreenOrientation.init();
-});
-
-// 添加移动端拖拽支持
-document.addEventListener('DOMContentLoaded', function() {
-    if ('ontouchstart' in window) {
-        document.addEventListener('touchmove', function(e) {
-            if (e.target.classList.contains('coin-obj')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    }
 });
 </script>
 </body>
