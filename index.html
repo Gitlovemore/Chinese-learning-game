@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>汉字寻宝 - 听音解锁累计版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>汉字寻宝 - 听音解锁累计版（移动端自适应）</title>
     <style>
         :root {
             --p: #ff7e5f; --s: #feb47b; 
@@ -11,6 +11,16 @@
             --red-btn: #d32f2f; --red-btn-light: #ff5252;
             --green: #43a047; --wrong: #e53935;
             --door-bg: #4a148c;
+        }
+
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            box-sizing: border-box;
         }
 
         body {
@@ -58,7 +68,10 @@
             border-radius: 15px; border: 2px dashed var(--p); 
             width: 60%; height: 80px; align-items: center; overflow-x: auto;
             position: relative; transition: 0.3s;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
+        #clue-tray::-webkit-scrollbar { display: none; }
         #clue-tray.drag-active {
             background: rgba(255, 215, 64, 0.2);
             border-color: #ffca28;
@@ -85,6 +98,7 @@
             box-shadow: 0 4px 0 #e65100; display: flex; align-items: center; gap: 8px;
             margin-bottom: 15px; margin-right: 5px;
             transition: transform 0.2s;
+            min-height: 44px;
         }
         .coin-pop { animation: popScale 0.3s ease-out; }
         @keyframes popScale { 0%{transform:scale(1);} 50%{transform:scale(1.3);} 100%{transform:scale(1);} }
@@ -95,8 +109,9 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-size: 1.8rem; font-weight: bold; transition: 0.2s;
             box-shadow: 0 5px 0 #ddd; margin: 6px;
+            min-height: 44px; min-width: 44px;
         }
-        .card:active { transform: translateY(4px); box-shadow: 0 1px 0 #ddd; }
+        .card:active { transform: translateY(4px) scale(0.95); box-shadow: 0 1px 0 #ddd; }
 
         .arcade-box {
             width: 280px; height: 400px; background: #3949ab;
@@ -127,11 +142,16 @@
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,0.5); font-weight: bold; font-size: 0.9rem;
             cursor: not-allowed; transition: 0.3s;
+            min-height: 44px; min-width: 44px;
         }
         .start-btn.active {
             background: var(--red-btn-light); border-color: var(--red-btn);
             box-shadow: 0 6px 0 #b71c1c; color: white; cursor: pointer; 
             animation: btnPulse 1s infinite;
+        }
+        @keyframes btnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         .coin-obj {
@@ -151,7 +171,9 @@
             border-radius: 12px; font-size: 1.8rem; font-weight: bold;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 0 #4527a0; transition: 0.2s;
+            min-height: 44px; min-width: 44px;
         }
+        .rune-stone:active { transform: translateY(4px) scale(0.95); box-shadow: 0 1px 0 #4527a0; }
         .rune-stone.solved {
             background: #81c784; border-color: #2e7d32; color: white;
             box-shadow: none; transform: translateY(4px); cursor: default;
@@ -167,8 +189,410 @@
             position: fixed; inset: 0; background: rgba(0,0,0,0.92);
             z-index: 1000; display: flex; align-items: center; justify-content: center;
         }
-        .setup-panel { background: white; padding: 30px; border-radius: 25px; text-align: center; width: 85%; max-width: 350px; }
+        .setup-panel { 
+            background: white; padding: 30px; border-radius: 25px; 
+            text-align: center; width: 85%; max-width: 350px; 
+        }
         .hidden { display: none !important; }
+        
+        input, textarea, button {
+            font-size: 16px; /* 防止iOS自动缩放 */
+        }
+
+        /* ========== 移动端自适应样式 ========== */
+        /* 小屏幕手机 (竖屏) */
+        @media (max-width: 480px) {
+            #game-stage {
+                width: 100vw;
+                height: 100dvh;
+                max-width: none;
+                max-height: none;
+                border-radius: 0;
+                padding: 10px;
+            }
+            
+            .card, .rune-stone {
+                width: 65px;
+                height: 65px;
+                font-size: 1.5rem;
+                margin: 4px;
+            }
+            
+            .arcade-box {
+                width: 90vw;
+                height: 50vh;
+                transform: scale(0.9);
+                transform-origin: center;
+            }
+            
+            #clue-tray {
+                height: 60px;
+                min-width: 70vw;
+            }
+            
+            .header {
+                font-size: 0.9rem;
+                padding: 3px 5px;
+            }
+            
+            #msg-hint {
+                font-size: 0.8rem;
+                max-width: 60%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .coin-status {
+                font-size: 1rem;
+                padding: 8px 15px;
+                margin-bottom: 10px;
+            }
+            
+            .bottom-ui {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--panel);
+                padding: 5px 10px;
+                z-index: 100;
+                height: auto;
+            }
+            
+            #level-content {
+                padding-bottom: 100px;
+            }
+            
+            .control-panel {
+                margin-top: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .coin-slot {
+                height: 45px;
+            }
+            
+            .start-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 0.8rem;
+            }
+            
+            html {
+                font-size: 14px;
+            }
+        }
+
+        /* 中等屏幕手机 (横屏/小平板) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            #game-stage {
+                width: 95vw;
+                height: 95vh;
+                max-width: none;
+            }
+            
+            .card, .rune-stone {
+                width: 70px;
+                height: 70px;
+                font-size: 1.6rem;
+            }
+            
+            .arcade-box {
+                width: 85vw;
+                height: 55vh;
+            }
+            
+            #clue-tray {
+                height: 70px;
+            }
+            
+            .header {
+                font-size: 1rem;
+            }
+        }
+
+        /* 平板设备 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #game-stage {
+                max-width: 90vw;
+                max-height: 90vh;
+            }
+            
+            .arcade-box {
+                width: 70vw;
+                height: 60vh;
+            }
+        }
+
+        /* 横屏模式优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #game-stage {
+                flex-direction: row;
+                padding: 5px;
+            }
+            
+            .header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10;
+                background: var(--panel);
+            }
+            
+            #level-content {
+                margin-top: 40px;
+            }
+            
+            .bottom-ui {
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+            }
+            
+            .arcade-box {
+                width: 50vw;
+                height: 85vh;
+                margin: 0 auto;
+            }
+            
+            .bottom-ui {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                height: auto;
+                padding: 10px;
+            }
+            
+            #clue-tray {
+                width: 50%;
+                height: 60px;
+            }
+            
+            #level-content {
+                padding-bottom: 80px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .card, .rune-stone, .coin-obj, .start-btn, #play-btn-L4 {
+                cursor: default;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .card:active, .rune-stone:active, .start-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s;
+            }
+            
+            .coin-slot::after {
+                content: '';
+                position: absolute;
+                top: -10px;
+                bottom: -10px;
+                left: -10px;
+                right: -10px;
+            }
+            
+            .clue-item, .card[draggable="true"] {
+                touch-action: manipulation;
+            }
+        }
+
+        /* 高DPI屏幕优化 */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .card, .rune-stone, .coin-obj {
+                border-width: 2px;
+            }
+        }
+
+        /* 暗色模式支持 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a2e;
+                --panel: #16213e;
+                --door-bg: #311b92;
+            }
+            
+            body {
+                background-color: var(--bg);
+                color: #e0e0e0;
+            }
+            
+            #game-stage {
+                background: var(--panel);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            }
+            
+            .header {
+                color: #bbbbbb;
+                border-bottom-color: #2d3748;
+            }
+            
+            .card, .rune-stone {
+                background: #2d3748;
+                color: #ffffff;
+                border-color: #4a5568;
+            }
+            
+            .clue-item {
+                background: #2d3748;
+                border-color: #4a5568;
+            }
+            
+            #clue-tray {
+                background: rgba(255, 126, 95, 0.1);
+                border-color: var(--p);
+            }
+            
+            .setup-panel {
+                background: #2d3748;
+                color: #e0e0e0;
+            }
+            
+            #words-input {
+                background: #4a5568;
+                color: #ffffff;
+                border-color: #718096;
+            }
+        }
+
+        /* 防止文字过小 */
+        @media (max-width: 360px) {
+            html {
+                font-size: 14px;
+            }
+            
+            .card, .rune-stone {
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+            
+            #clue-tray {
+                height: 55px;
+            }
+            
+            .clue-char {
+                font-size: 0.9rem;
+            }
+            
+            .clue-pinyin {
+                font-size: 0.5rem;
+            }
+        }
+
+        /* 超大屏幕优化 */
+        @media (min-width: 1400px) {
+            #game-stage {
+                max-width: 1000px;
+                max-height: 800px;
+            }
+            
+            .card, .rune-stone {
+                width: 85px;
+                height: 85px;
+                font-size: 2rem;
+            }
+        }
+
+        /* 全面屏手机适配 */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            
+            #game-stage {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+                padding-top: max(15px, env(safe-area-inset-top));
+                padding-bottom: max(15px, env(safe-area-inset-bottom));
+            }
+            
+            .bottom-ui {
+                padding-bottom: max(10px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* 动画性能优化 */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* 方向特定的布局 */
+        .portrait-mode .arcade-box {
+            width: 90vw;
+            height: 50vh;
+        }
+
+        .landscape-mode .arcade-box {
+            width: 50vw;
+            height: 80vh;
+        }
+
+        /* 触摸激活状态 */
+        .touch-active {
+            opacity: 0.7;
+            transform: scale(0.95);
+        }
+
+        /* 设置页面按钮 */
+        .setup-panel button {
+            padding: 12px 40px;
+            background: var(--p);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            min-height: 44px;
+            font-size: 16px;
+        }
+        
+        .setup-panel button:active {
+            transform: scale(0.95);
+        }
+
+        #words-input {
+            width: 85%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        /* 魔法乐园按钮 */
+        .shop-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #fff;
+            font-weight: bold;
+            min-height: 44px;
+        }
+        
+        .shop-btn.special {
+            background: gold;
+        }
+        
+        .shop-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body id="main-body">
@@ -176,10 +600,10 @@
     <div id="setup-screen">
         <div class="setup-panel">
             <h2 style="color:var(--p)">🦁 汉字探险启动</h2>
-            <p>输入要学习的汉字：</p>
-            <input type="text" id="words-input" value="山 水 日 月" style="width: 85%; padding: 12px; margin-bottom: 20px; border: 2px solid #eee; border-radius: 10px; font-size: 1rem;">
-            <br>
-            <button onclick="Game.start()" style="padding: 12px 40px; background: var(--p); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;">出发！</button>
+            <p>输入要学习的汉字（用空格分隔）：</p>
+            <input type="text" id="words-input" value="山 水 日 月" placeholder="例如：山 水 日 月">
+            <br><br>
+            <button onclick="Game.start()">出发！</button>
         </div>
     </div>
 
@@ -196,7 +620,11 @@
     </div>
 
 <script>
-const PinyinDict = {"山":"shān","水":"shuǐ","日":"rì","月":"yuè","天":"tiān","地":"dì","人":"rén","口":"kǒu","手":"shǒu","足":"zú","大":"dà","小":"xiǎo","多":"duō","少":"shǎo"};
+const PinyinDict = {
+    "山":"shān","水":"shuǐ","日":"rì","月":"yuè","天":"tiān","地":"dì",
+    "人":"rén","口":"kǒu","手":"shǒu","足":"zú","大":"dà","小":"xiǎo",
+    "多":"duō","少":"shǎo","木":"mù","火":"huǒ","土":"tǔ","金":"jīn"
+};
 
 const AudioSys = {
     speak(t) {
@@ -215,19 +643,93 @@ const AudioSys = {
     }
 };
 
+// 触摸支持模块
+const TouchSupport = {
+    init() {
+        // 为触摸设备优化交互
+        if ('ontouchstart' in window) {
+            // 添加触摸事件监听
+            document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+            document.addEventListener('touchend', this.handleTouchEnd, { passive: true });
+            
+            // 防止双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+    },
+    
+    handleTouchStart(e) {
+        const target = e.target;
+        if (target.classList.contains('card') || 
+            target.classList.contains('rune-stone') ||
+            target.classList.contains('start-btn') ||
+            target.classList.contains('shop-btn') ||
+            target.classList.contains('coin-obj')) {
+            target.classList.add('touch-active');
+        }
+    },
+    
+    handleTouchEnd(e) {
+        document.querySelectorAll('.touch-active').forEach(el => {
+            el.classList.remove('touch-active');
+        });
+    }
+};
+
+// 屏幕方向检测
+const ScreenOrientation = {
+    isPortrait: window.innerHeight > window.innerWidth,
+    
+    init() {
+        this.updateOrientationClass();
+        window.addEventListener('resize', this.handleResize.bind(this));
+        window.addEventListener('orientationchange', () => {
+            setTimeout(this.handleResize.bind(this), 100);
+        });
+    },
+    
+    handleResize() {
+        const newIsPortrait = window.innerHeight > window.innerWidth;
+        if (newIsPortrait !== this.isPortrait) {
+            this.isPortrait = newIsPortrait;
+            this.updateOrientationClass();
+        }
+    },
+    
+    updateOrientationClass() {
+        document.body.classList.remove('portrait-mode', 'landscape-mode');
+        document.body.classList.add(this.isPortrait ? 'portrait-mode' : 'landscape-mode');
+    }
+};
+
 const Game = {
     words: [], collected: [], coins: 0, level: 1, walletSize: 0,
     
     start() {
-        // --- 核心更新：从本地存储读取累计金币 ---
+        // 从本地存储读取累计金币
         const savedCoins = localStorage.getItem('hjtx_total_coins');
         this.coins = savedCoins ? parseInt(savedCoins) : 0;
 
         const raw = document.getElementById('words-input').value.trim();
         this.words = raw.split(/\s+/).filter(x => x);
-        if(this.words.length < 1) return alert("请输入汉字");
+        if(this.words.length < 1) {
+            alert("请输入至少一个汉字");
+            return;
+        }
+        
         document.getElementById('setup-screen').classList.add('hidden');
         document.getElementById('game-stage').style.display = 'flex';
+        
+        // 初始化触摸支持和屏幕方向检测
+        TouchSupport.init();
+        ScreenOrientation.init();
+        
         this.initL1();
     },
 
@@ -237,13 +739,22 @@ const Game = {
         if (cVal.textContent != this.coins) {
             cVal.textContent = this.coins;
             document.querySelector('.coin-status').classList.add('coin-pop');
-            setTimeout(()=>document.querySelector('.coin-status').classList.remove('coin-pop'), 300);
-            // --- 核心更新：金币变动即保存，实现跨局累计 ---
+            setTimeout(() => document.querySelector('.coin-status').classList.remove('coin-pop'), 300);
+            // 金币变动即保存，实现跨局累计
             localStorage.setItem('hjtx_total_coins', this.coins);
         }
     },
 
-    setHint(t) { document.getElementById('msg-hint').textContent = t; },
+    setHint(t) { 
+        const hintEl = document.getElementById('msg-hint');
+        hintEl.textContent = t;
+        // 移动端优化：长文本自动滚动
+        if (t.length > 20 && window.innerWidth < 768) {
+            hintEl.style.animation = 'marquee 10s linear infinite';
+        } else {
+            hintEl.style.animation = '';
+        }
+    },
 
     addClue(w) {
         if(this.collected.includes(w)) return;
@@ -257,58 +768,114 @@ const Game = {
     },
 
     initL1() {
-        this.level = 1; this.updateUI();
-        this.setHint("算出得数，拖动正确的汉字！");
+        this.level = 1; 
+        this.updateUI();
+        this.setHint("算出得数，点击正确的数字！");
         const cont = document.getElementById('level-content');
         let idx = 0;
+        
         const renderTask = () => {
             if(idx >= this.words.length) return setTimeout(() => this.initL2(), 1200);
             const a = Math.floor(Math.random()*5)+1, b = Math.floor(Math.random()*4)+1;
-            cont.innerHTML = `<div style="font-size:3rem; margin-bottom:30px; font-weight:bold; color:#555;">${a} + ${b} = ?</div><div id="L1-grid" style="display:flex; gap:15px;"></div>`;
+            cont.innerHTML = `
+                <div style="font-size:3rem; margin-bottom:30px; font-weight:bold; color:#555; text-align:center;">
+                    ${a} + ${b} = ?
+                </div>
+                <div id="L1-grid" style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;"></div>`;
+            
             const grid = document.getElementById('L1-grid');
             [a+b, a+b+1, a+b-1].sort(()=>Math.random()-0.5).forEach(v => {
                 const c = document.createElement('div');
-                c.className = 'card'; c.textContent = v;
+                c.className = 'card'; 
+                c.textContent = v;
                 c.onclick = () => {
                     if(v === a+b) {
-                        AudioSys.playTone(600); const w = this.words[idx];
-                        c.innerHTML = `<span style="font-size:0.6rem">${PinyinDict[w]||''}</span>${w}`;
-                        c.style.background = "#fff9c4"; c.draggable = true;
-                        c.ondragstart = (e) => { e.dataTransfer.setData('text/plain', w); document.getElementById('clue-tray').classList.add('drag-active'); };
+                        AudioSys.playTone(600); 
+                        const w = this.words[idx];
+                        c.innerHTML = `<span style="font-size:0.8rem; color:#666;">${PinyinDict[w]||''}</span><span style="font-size:1.5rem;">${w}</span>`;
+                        c.style.background = "#fff9c4"; 
+                        c.draggable = true;
+                        c.ondragstart = (e) => { 
+                            e.dataTransfer.setData('text/plain', w); 
+                            document.getElementById('clue-tray').classList.add('drag-active'); 
+                        };
                         c.ondragend = () => document.getElementById('clue-tray').classList.remove('drag-active');
                         AudioSys.speak(w);
-                    } else AudioSys.playTone(150, 'square');
+                    } else {
+                        AudioSys.playTone(150, 'square');
+                    }
                 };
                 grid.appendChild(c);
             });
         };
+        
         const tray = document.getElementById('clue-tray');
+        tray.innerHTML = ''; // 清空之前的收集
+        this.collected = [];
+        
         tray.ondragover = e => e.preventDefault();
-        tray.ondrop = e => { e.preventDefault(); tray.classList.remove('drag-active'); const w = e.dataTransfer.getData('text/plain'); if(w && !['gold'].includes(w)) { this.addClue(w); idx++; renderTask(); }};
+        tray.ondrop = e => { 
+            e.preventDefault(); 
+            tray.classList.remove('drag-active'); 
+            const w = e.dataTransfer.getData('text/plain'); 
+            if(w && !['gold'].includes(w)) { 
+                this.addClue(w); 
+                idx++; 
+                renderTask(); 
+            }
+        };
+        
         renderTask();
     },
 
     initL2() {
-        this.level = 2; this.updateUI();
-        this.setHint("点中读音对应的字，赚取初始金币！");
+        this.level = 2; 
+        this.updateUI();
+        this.setHint("点击读音对应的字，赚取金币！");
         const cont = document.getElementById('level-content');
         this.walletSize = 0;
         let queue = [...this.words].sort(() => Math.random() - 0.5);
         let qIndex = 0;
+        
         const nextQ = () => {
-            if(qIndex >= queue.length) return setTimeout(()=>this.initL3(), 1500);
+            if(qIndex >= queue.length) return setTimeout(() => this.initL3(), 1500);
             const target = queue[qIndex];
             
-            // --- 核心更新：喇叭图标增加点击重播功能 ---
             cont.innerHTML = `
-                <div onclick="AudioSys.speak('${target}')" style="font-size:4rem; cursor:pointer; margin-bottom:20px;">🔊</div>
-                <div id="L2-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;"></div>`;
+                <div onclick="AudioSys.speak('${target}')" style="font-size:4rem; cursor:pointer; margin-bottom:20px; padding:20px; background:#f0f0f0; border-radius:50%;">
+                    🔊
+                </div>
+                <div style="font-size:0.9rem; margin-bottom:20px; color:#666;">点击喇叭重播声音</div>
+                <div id="L2-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:300px;"></div>`;
             
             AudioSys.speak(target);
             const grid = document.getElementById('L2-grid');
-            Array.from(new Set([target, ...this.words, '大','天','土','木'])).slice(0,6).sort(()=>Math.random()-0.5).forEach(w => {
-                const c = document.createElement('div'); c.className = 'card'; c.textContent = w;
-                c.onclick = () => { if(w === target) { AudioSys.playTone(1000); this.coins+=1; this.walletSize++; this.updateUI(); qIndex++; nextQ(); } else AudioSys.playTone(200, 'sawtooth'); };
+            
+            // 生成选项：正确答案 + 随机干扰项
+            const options = new Set([target]);
+            while(options.size < 6) {
+                const randomWord = Object.keys(PinyinDict)[Math.floor(Math.random() * Object.keys(PinyinDict).length)];
+                options.add(randomWord);
+            }
+            
+            Array.from(options).slice(0, 6).sort(()=>Math.random()-0.5).forEach(w => {
+                const c = document.createElement('div'); 
+                c.className = 'card'; 
+                c.textContent = w;
+                c.onclick = () => { 
+                    if(w === target) { 
+                        AudioSys.playTone(1000); 
+                        this.coins += 1; 
+                        this.walletSize++; 
+                        this.updateUI(); 
+                        qIndex++; 
+                        setTimeout(nextQ, 500); // 延迟显示下一题，让用户看到反馈
+                    } else { 
+                        AudioSys.playTone(200, 'sawtooth'); 
+                        c.style.background = "#ffebee"; // 错误反馈
+                        setTimeout(() => c.style.background = "", 300);
+                    } 
+                };
                 grid.appendChild(c);
             });
         };
@@ -316,91 +883,206 @@ const Game = {
     },
 
     initL3() {
-        this.level = 3; this.updateUI();
-        this.setHint(`投入金币启动机器，玩游戏赚更多钱！`);
+        this.level = 3; 
+        this.updateUI();
+        this.setHint(`投入金币启动游戏机！`);
         const cont = document.getElementById('level-content');
-        cont.innerHTML = `<div style="display:flex; gap:20px; align-items:center;"><div id="purse" style="width:90px; height:200px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px; border:2px solid #ddd; border-radius:15px; padding:10px; overflow-y:auto; background:#fff;"></div><div class="arcade-box"><div class="arcade-screen" id="arcade-scr">INSERT<br>COINS</div><div class="control-panel"><div class="coin-slot" id="target-slot"></div><div id="btn-start" class="start-btn">START</div></div></div></div>`;
+        
+        // 移动端优化：调整布局
+        const isMobile = window.innerWidth < 768;
+        const purseWidth = isMobile ? '80px' : '90px';
+        
+        cont.innerHTML = `
+            <div style="display:flex; ${isMobile ? 'flex-direction:column; align-items:center; gap:20px;' : 'gap:20px; align-items:center;'}">
+                <div id="purse" style="width:${purseWidth}; height:200px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px; border:2px solid #ddd; border-radius:15px; padding:10px; overflow-y:auto; background:#fff;">
+                    <div style="width:100%; text-align:center; font-size:0.8rem; color:#888;">金币钱包</div>
+                </div>
+                <div class="arcade-box">
+                    <div class="arcade-screen" id="arcade-scr">INSERT<br>COINS</div>
+                    <div class="control-panel">
+                        <div class="coin-slot" id="target-slot"></div>
+                        <div id="btn-start" class="start-btn">START</div>
+                    </div>
+                </div>
+            </div>`;
+        
         const purse = document.getElementById('purse');
-        for(let i=0; i<this.walletSize; i++) { const c = document.createElement('div'); c.className = 'coin-obj'; c.textContent = '¥'; c.draggable = true; c.ondragstart = e => e.dataTransfer.setData('type', 'gold'); purse.appendChild(c); }
-        let inserted = 0; const req = this.walletSize; 
+        // 生成钱包中的金币
+        for(let i=0; i<this.walletSize; i++) { 
+            const c = document.createElement('div'); 
+            c.className = 'coin-obj'; 
+            c.textContent = '¥'; 
+            c.draggable = true; 
+            c.ondragstart = e => e.dataTransfer.setData('type', 'gold'); 
+            purse.appendChild(c); 
+        }
+        
+        let inserted = 0; 
+        const req = this.walletSize; 
         const slot = document.getElementById('target-slot');
+        
         slot.ondragover = e => e.preventDefault();
         slot.ondrop = e => {
             if(e.dataTransfer.getData('type') === 'gold' && purse.lastChild) {
-                purse.lastChild.remove(); AudioSys.playTone(1200);
-                if(this.coins > 0) this.coins--; this.updateUI();
-                inserted++; document.getElementById('arcade-scr').innerHTML = `CREDITS<br>${inserted}`;
+                purse.lastChild.remove(); 
+                AudioSys.playTone(1200);
+                if(this.coins > 0) this.coins--; 
+                this.updateUI();
+                inserted++; 
+                document.getElementById('arcade-scr').innerHTML = `已投入<br>${inserted}/${req}`;
                 if(inserted >= req) this.enableStartButton();
             }
         };
+        
+        // 移动端触摸拖拽支持
+        if ('ontouchstart' in window) {
+            const coins = document.querySelectorAll('.coin-obj');
+            coins.forEach(coin => {
+                coin.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    coin.style.position = 'absolute';
+                    coin.style.left = touch.clientX - 22 + 'px';
+                    coin.style.top = touch.clientY - 22 + 'px';
+                });
+            });
+        }
     },
+    
     enableStartButton() {
         const btn = document.getElementById('btn-start');
-        document.getElementById('arcade-scr').innerHTML = "PRESS<br>START";
+        document.getElementById('arcade-scr').innerHTML = "准备<br>开始";
         document.getElementById('arcade-scr').style.color = "#ffff00";
         btn.classList.add('active');
-        btn.onclick = () => { AudioSys.playTone(1500, 'square'); btn.classList.remove('active'); this.startListeningMoleGame(); };
+        btn.onclick = () => { 
+            AudioSys.playTone(1500, 'square'); 
+            btn.classList.remove('active'); 
+            this.startMoleGame(); 
+        };
     },
-    startListeningMoleGame() {
-        const scr = document.getElementById('arcade-scr'); scr.innerHTML = "";
+    
+    startMoleGame() {
+        const scr = document.getElementById('arcade-scr'); 
+        scr.innerHTML = "";
+        
+        // 顶部控制栏
         const topBar = document.createElement('div');
         topBar.style.cssText = "width:100%; height:30px; background:#222; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.8rem; border-bottom:1px solid #444;";
-        topBar.innerHTML = "🔊 点击重播"; scr.appendChild(topBar);
+        topBar.innerHTML = "🔊 点击重播"; 
+        scr.appendChild(topBar);
+        
+        // 游戏网格
         const grid = document.createElement('div');
-        grid.style.cssText = "display:grid; grid-template-columns:repeat(3,1fr); width:100%; height:125px; gap:6px; padding:4px; box-sizing:border-box;"; scr.appendChild(grid);
+        const isMobile = window.innerWidth < 768;
+        const gridSize = isMobile ? '100px' : '125px';
+        grid.style.cssText = `display:grid; grid-template-columns:repeat(3,1fr); width:100%; height:${gridSize}; gap:6px; padding:4px; box-sizing:border-box;`;
+        scr.appendChild(grid);
+        
         const holes = [];
         for(let i=0; i<3; i++) {
-            const h = document.createElement('div'); h.style.cssText = "background:#111; position:relative; overflow:hidden; border-radius:4px;";
-            const m = document.createElement('div'); m.style.cssText = "width:100%; height:100%; background:#ffa000; position:absolute; bottom:-100%; transition:bottom 0.2s; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#3e2723; cursor:pointer; font-size:1.5rem;";
-            h.appendChild(m); grid.appendChild(h); holes.push(m);
+            const hole = document.createElement('div'); 
+            hole.style.cssText = "background:#111; position:relative; overflow:hidden; border-radius:4px;";
+            const mole = document.createElement('div'); 
+            mole.style.cssText = "width:100%; height:100%; background:#ffa000; position:absolute; bottom:-100%; transition:bottom 0.2s; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#3e2723; cursor:pointer; font-size:1.5rem;";
+            hole.appendChild(mole); 
+            grid.appendChild(hole); 
+            holes.push(mole);
         }
+        
         let round = 0;
         const playRound = () => {
-            if(round >= 5) return setTimeout(()=>this.initL4(), 1000);
+            if(round >= 5) return setTimeout(() => this.initL4(), 1000);
             const target = this.words[Math.floor(Math.random()*this.words.length)];
-            const opts = [target, "大", "人"].sort(()=>Math.random()-0.5);
+            const opts = [target, ...this.words.filter(w => w !== target).slice(0, 2)].sort(()=>Math.random()-0.5);
+            
             topBar.onclick = () => AudioSys.speak(target);
             AudioSys.speak(target);
-            holes.forEach((m, idx) => {
-                m.textContent = opts[idx]; m.style.background = "#ffa000"; m.style.bottom = "0";
-                m.onclick = () => {
-                    if(opts[idx] === target) {
-                        m.style.background = "var(--green)"; AudioSys.playTone(1000);
-                        this.coins += 2; this.updateUI(); round++;
-                        holes.forEach(h => h.style.bottom = "-100%"); setTimeout(playRound, 1200);
-                    } else AudioSys.playTone(150, 'sawtooth');
-                };
+            
+            holes.forEach((mole, idx) => {
+                if (idx < opts.length) {
+                    mole.textContent = opts[idx]; 
+                    mole.style.background = "#ffa000"; 
+                    mole.style.bottom = "0";
+                    mole.onclick = () => {
+                        if(opts[idx] === target) {
+                            mole.style.background = "var(--green)"; 
+                            AudioSys.playTone(1000);
+                            this.coins += 2; 
+                            this.updateUI(); 
+                            round++;
+                            holes.forEach(h => h.style.bottom = "-100%"); 
+                            setTimeout(playRound, 1200);
+                        } else { 
+                            AudioSys.playTone(150, 'sawtooth'); 
+                            mole.style.background = "#f44336";
+                            setTimeout(() => mole.style.background = "#ffa000", 300);
+                        }
+                    };
+                }
             });
         };
         playRound();
     },
 
     initL4() {
-        this.level = 4; this.updateUI();
-        this.setHint("听声音，解开魔法锁！(奖励: 5金币/字)");
+        this.level = 4; 
+        this.updateUI();
+        this.setHint("听声音，按顺序解开魔法锁！");
         const cont = document.getElementById('level-content');
-        cont.innerHTML = `<div style="font-size:3rem; margin-bottom:10px;">🚪 🔒</div><div id="play-btn-L4" style="font-size:1.5rem; background:#eee; padding:5px 20px; border-radius:20px; cursor:pointer; margin-bottom:15px;">🔊 点击听密码</div><div id="lock-grid" class="lock-grid"></div>`;
+        
+        cont.innerHTML = `
+            <div style="font-size:3rem; margin-bottom:10px;">🚪 🔒</div>
+            <div id="play-btn-L4" style="font-size:1.2rem; background:#eee; padding:12px 25px; border-radius:20px; cursor:pointer; margin-bottom:20px; min-height:44px; display:flex; align-items:center; gap:10px;">
+                <span>🔊</span> <span>点击听密码</span>
+            </div>
+            <div id="lock-grid" class="lock-grid"></div>`;
+        
         const grid = document.getElementById('lock-grid');
         const puzzleWords = [...this.words].sort(() => Math.random() - 0.5);
+        
         puzzleWords.forEach(w => {
-            const btn = document.createElement('div'); btn.className = 'rune-stone'; btn.id = `rune-${w}`; btn.textContent = w; grid.appendChild(btn);
+            const btn = document.createElement('div'); 
+            btn.className = 'rune-stone'; 
+            btn.id = `rune-${w}`; 
+            btn.textContent = w; 
+            grid.appendChild(btn);
         });
+        
         let sequence = [...this.words].sort(() => Math.random() - 0.5);
         let currentStep = 0;
+        
         const askForNext = () => {
             if(currentStep >= sequence.length) return setTimeout(() => this.initMagicWorld(), 1500);
             const target = sequence[currentStep];
             const playBtn = document.getElementById('play-btn-L4');
-            const playSound = () => { AudioSys.speak("请点击 " + target); };
-            playBtn.onclick = playSound; playSound();
+            
+            const playSound = () => { 
+                AudioSys.speak("请点击 " + target); 
+            };
+            playBtn.onclick = playSound; 
+            playSound();
+            
             puzzleWords.forEach(w => {
                 const btn = document.getElementById(`rune-${w}`);
                 if(btn.classList.contains('solved')) return;
                 btn.onclick = () => {
                     if(w === target) {
-                        btn.classList.add('solved'); btn.onclick = null; AudioSys.playTone(880);
-                        this.coins += 5; this.updateUI(); currentStep++; setTimeout(askForNext, 1000);
-                    } else { AudioSys.playTone(150, 'sawtooth'); if(this.coins > 0) {this.coins--; this.updateUI();} }
+                        btn.classList.add('solved'); 
+                        btn.onclick = null; 
+                        AudioSys.playTone(880);
+                        this.coins += 5; 
+                        this.updateUI(); 
+                        currentStep++; 
+                        setTimeout(askForNext, 1000);
+                    } else { 
+                        AudioSys.playTone(150, 'sawtooth'); 
+                        btn.style.background = "#ffebee";
+                        setTimeout(() => btn.style.background = "", 300);
+                        if(this.coins > 0) {
+                            this.coins--; 
+                            this.updateUI();
+                        }
+                    }
                 };
             });
         };
@@ -408,22 +1090,78 @@ const Game = {
     },
 
     initMagicWorld() {
-        this.level = "通关"; this.updateUI();
+        this.level = "通关"; 
+        this.updateUI();
         const cont = document.getElementById('level-content');
-        cont.innerHTML = `<div class="magic-world"><h2>✨ 魔法乐园 ✨</h2><div id="dancer" style="font-size:6rem;">🦁</div><div style="background:rgba(255,255,255,0.2); padding:15px; border-radius:15px; margin-top:20px;"><div style="display:flex; gap:10px;"><button onclick="Game.doDance('🦁', 5)" class="shop-btn">🦁 跳舞 (5💰)</button><button onclick="Game.doDance('🐉', 30)" class="shop-btn special">🐉 神龙 (30💰)</button></div></div><button onclick="location.reload()" style="margin-top:25px; border:1px solid #fff; background:transparent; color:#fff; padding:8px 20px; border-radius:20px;">再来一局</button></div>`;
-        const style = document.createElement('style');
-        style.innerHTML = `.shop-btn { padding:10px; border:none; border-radius:10px; cursor:pointer; background:#fff; font-weight:bold; } .shop-btn.special { background: gold; }`;
-        document.head.appendChild(style);
+        
+        cont.innerHTML = `
+            <div class="magic-world">
+                <h2>✨ 魔法乐园 ✨</h2>
+                <div id="dancer" style="font-size:6rem; margin:20px 0;">🦁</div>
+                <div style="background:rgba(255,255,255,0.2); padding:15px; border-radius:15px; margin-top:20px;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="Game.doDance('🦁', 5)" class="shop-btn">🦁 跳舞 (5💰)</button>
+                        <button onclick="Game.doDance('🐉', 30)" class="shop-btn special">🐉 神龙 (30💰)</button>
+                        <button onclick="Game.doDance('🌈', 15)" class="shop-btn">🌈 彩虹 (15💰)</button>
+                    </div>
+                </div>
+                <div style="margin-top:30px; font-size:0.9rem;">
+                    累计金币: <strong>${this.coins}</strong> 💰
+                </div>
+                <button onclick="location.reload()" style="margin-top:25px; border:1px solid #fff; background:transparent; color:#fff; padding:12px 30px; border-radius:20px; font-size:1rem; min-height:44px;">
+                    再来一局
+                </button>
+            </div>`;
     },
 
     doDance(icon, cost) {
-        if(this.coins < cost) return alert("金币不足！");
-        this.coins -= cost; this.updateUI();
-        const d = document.getElementById('dancer'); d.textContent = icon;
-        d.animate([{transform:'scale(1)'},{transform:'scale(1.5) rotate(360deg)'},{transform:'scale(1)'}], {duration:1000});
+        if(this.coins < cost) {
+            alert("金币不足！");
+            return;
+        }
+        this.coins -= cost; 
+        this.updateUI();
+        const d = document.getElementById('dancer'); 
+        d.textContent = icon;
+        d.animate([
+            {transform:'scale(1)', opacity: 1},
+            {transform:'scale(1.5) rotate(360deg)', opacity: 0.8},
+            {transform:'scale(1)', opacity: 1}
+        ], {duration:1000, iterations: 1});
         AudioSys.playTone(1000);
     }
 };
+
+// 页面加载时初始化
+window.addEventListener('DOMContentLoaded', () => {
+    // 添加文字滚动动画
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        #msg-hint {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // 初始化屏幕方向检测
+    ScreenOrientation.init();
+});
+
+// 添加移动端拖拽支持
+document.addEventListener('DOMContentLoaded', function() {
+    if ('ontouchstart' in window) {
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.classList.contains('coin-obj')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    }
+});
 </script>
 </body>
 </html>
